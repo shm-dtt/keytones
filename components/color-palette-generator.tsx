@@ -1,99 +1,116 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useRef } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle, CardAction } from "@/components/ui/card"
-import { Upload, Palette, Download, FileText, ImageIcon, Video } from "lucide-react"
-import { toast } from "sonner"
-import { usePaletteProcessor } from "@/hooks/usePaletteProcessor"
-import { UploadDropzone } from "@/components/UploadDropzone"
-import { VideoControls } from "@/components/VideoControls"
-import { ColorItem } from "@/components/ColorItem"
-import type { ColorData } from "@/lib/colors"
+import { useRef } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardAction,
+} from "@/components/ui/card";
+import {
+  Upload,
+  Palette,
+  Download,
+  FileText,
+  ImageIcon,
+  Video,
+} from "lucide-react";
+import { toast } from "sonner";
+import { usePaletteProcessor } from "@/hooks/usePaletteProcessor";
+import { UploadDropzone } from "@/components/UploadDropzone";
+import { VideoControls } from "@/components/VideoControls";
+import { ColorItem } from "@/components/ColorItem";
+import type { ColorData } from "@/lib/colors";
+import Image from "next/image";
 
 export default function ColorPaletteGenerator() {
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const {
     state: { file, colors, isProcessing, fileType, frameRate },
     refs: { canvasRef, paletteCanvasRef },
     actions: { setFrameRate, handleFileSelect },
-  } = usePaletteProcessor()
+  } = usePaletteProcessor();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0]
-    if (selectedFile) handleFileSelect(selectedFile)
-  }
+    const selectedFile = event.target.files?.[0];
+    if (selectedFile) handleFileSelect(selectedFile);
+  };
 
   const exportColorsText = () => {
-    if (colors.length === 0) return
+    if (colors.length === 0) return;
 
     const content = colors
       .map((color, index) => {
         if (fileType === "video") {
-          return `Frame ${color.frame}: ${color.hex} (${color.rgb})`
+          return `Frame ${color.frame}: ${color.hex} (${color.rgb})`;
         } else {
-          return `Color ${index + 1}: ${color.hex} (${color.rgb})`
+          return `Color ${index + 1}: ${color.hex} (${color.rgb})`;
         }
       })
-      .join("\n")
+      .join("\n");
 
-    const blob = new Blob([content], { type: "text/plain" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = `color-palette-${file?.name || "export"}.txt`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-  }
+    const blob = new Blob([content], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `color-palette-${file?.name || "export"}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   const exportPaletteImage = () => {
-    const canvas = paletteCanvasRef.current
-    if (!canvas || fileType !== "image") return
+    const canvas = paletteCanvasRef.current;
+    if (!canvas || fileType !== "image") return;
 
     canvas.toBlob((blob) => {
       if (blob) {
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement("a")
-        a.href = url
-        a.download = `color-palette-${file?.name || "export"}.png`
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-        URL.revokeObjectURL(url)
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `color-palette-${file?.name || "export"}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
       }
-    })
-  }
+    });
+  };
 
   const copyToClipboard = async (text: string) => {
     try {
-      await navigator.clipboard.writeText(text)
+      await navigator.clipboard.writeText(text);
     } catch {
-      const textarea = document.createElement("textarea")
-      textarea.value = text
-      textarea.style.position = "fixed"
-      textarea.style.left = "-9999px"
-      document.body.appendChild(textarea)
-      textarea.focus()
-      textarea.select()
-      document.execCommand("copy")
-      document.body.removeChild(textarea)
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
     }
-    toast(`Copied ${text}`)
-  }
+    toast(`Copied ${text}`);
+  };
 
   return (
     <div className="min-h-screen p-4">
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="text-center space-y-2">
           <h1 className="text-3xl sm:text-4xl font-bold text-foreground flex items-center justify-center gap-2">
-            <Palette className="w-8 h-8 text-primary" />
-            Color Palette Generator
+            <Image src="/favicon.ico" alt="Keytones Logo" width={32} height={32} />
+            Keytones
           </h1>
-          <p className="text-muted-foreground">Extract color palettes from images or dominant colors from video frames</p>
+          <p className="text-muted-foreground">
+            Extract color palettes from images or dominant colors from video
+            frames
+          </p>
         </div>
 
         <Card>
@@ -116,7 +133,10 @@ export default function ColorPaletteGenerator() {
               <UploadDropzone onPick={() => fileInputRef.current?.click()} />
 
               {file && fileType === "video" && (
-                <VideoControls frameRate={frameRate} setFrameRate={setFrameRate} />
+                <VideoControls
+                  frameRate={frameRate}
+                  setFrameRate={setFrameRate}
+                />
               )}
 
               {file && (
@@ -127,7 +147,9 @@ export default function ColorPaletteGenerator() {
                     ) : (
                       <Video className="w-4 h-4 text-primary" />
                     )}
-                    <span className="text-sm font-medium break-all">{file.name}</span>
+                    <span className="text-sm font-medium break-all">
+                      {file.name}
+                    </span>
                   </div>
                 </div>
               )}
@@ -143,7 +165,9 @@ export default function ColorPaletteGenerator() {
                 <span>
                   Processing {fileType}...
                   {fileType === "video" && colors.length > 0 && (
-                    <span className="text-sm text-muted-foreground ml-2">({colors.length} frames processed)</span>
+                    <span className="text-sm text-muted-foreground ml-2">
+                      ({colors.length} frames processed)
+                    </span>
                   )}
                 </span>
               </div>
@@ -157,7 +181,11 @@ export default function ColorPaletteGenerator() {
               <CardTitle>Color Palette Preview</CardTitle>
               <CardAction>
                 <div className="flex gap-2">
-                  <Button onClick={exportPaletteImage} size="sm" variant="outline">
+                  <Button
+                    onClick={exportPaletteImage}
+                    size="sm"
+                    variant="outline"
+                  >
                     <Download className="w-4 h-4 mr-1" />
                     Image
                   </Button>
@@ -187,7 +215,11 @@ export default function ColorPaletteGenerator() {
               </CardTitle>
               <CardAction>
                 <div className="flex gap-2">
-                  <Button onClick={exportColorsText} size="sm" variant="outline">
+                  <Button
+                    onClick={exportColorsText}
+                    size="sm"
+                    variant="outline"
+                  >
                     <Download className="w-4 h-4 mr-1" />
                     Hex Codes
                   </Button>
@@ -216,5 +248,5 @@ export default function ColorPaletteGenerator() {
         <canvas ref={canvasRef} className="hidden" />
       </div>
     </div>
-  )
+  );
 }
