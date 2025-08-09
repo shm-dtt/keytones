@@ -370,11 +370,11 @@ export default function ColorPaletteGenerator() {
     <div className="min-h-screen p-4">
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold flex items-center justify-center gap-2">
-            <Palette className="w-8 h-8" />
+          <h1 className="text-3xl sm:text-4xl font-bold text-foreground flex items-center justify-center gap-2">
+            <Palette className="w-8 h-8 text-primary" />
             Color Palette Generator
           </h1>
-          <p >Extract color palettes from images or dominant colors from video frames</p>
+          <p className="text-muted-foreground">Extract color palettes from images or dominant colors from video frames</p>
         </div>
 
         <Card>
@@ -395,21 +395,21 @@ export default function ColorPaletteGenerator() {
               />
 
               <div
-                className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-purple-400 transition-colors cursor-pointer"
+                className="border-dashed border rounded-lg p-6 sm:p-8 text-center hover:border-primary hover:bg-muted/30 transition-colors cursor-pointer"
                 onClick={() => fileInputRef.current?.click()}
               >
                 <div className="space-y-2">
                   <div className="flex justify-center gap-4">
-                    <ImageIcon className="w-8 h-8" />
-                    <Video className="w-8 h-8" />
+                    <ImageIcon className="w-8 h-8 text-muted-foreground" />
+                    <Video className="w-8 h-8 text-muted-foreground" />
                   </div>
-                  <p className="">Click to upload an image or video</p>
-                  <p className="text-sm">Supports JPG, PNG, MP4, WebM, and more</p>
+                  <p className="text-muted-foreground">Click to upload an image or video</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Supports JPG, PNG, MP4, WebM, and more</p>
                 </div>
               </div>
 
               {file && fileType === "video" && (
-                <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center flex-wrap gap-3 sm:gap-4 p-3 bg-muted rounded-lg">
                   <span className="text-sm font-medium">Frame sampling rate:</span>
                   <div className="flex gap-2">
                     <Button size="sm" variant={frameRate === 1 ? "default" : "outline"} onClick={() => setFrameRate(1)}>
@@ -422,22 +422,22 @@ export default function ColorPaletteGenerator() {
                       5 FPS
                     </Button>
                   </div>
-                  <span className="text-xs">(~{Math.floor(16 * frameRate)} frames for 16s video)</span>
+                  <span className="text-xs text-muted-foreground">(~{Math.floor(16 * frameRate)} frames for 16s video)</span>
                 </div>
               )}
 
               {file && (
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between gap-3 p-3 bg-muted rounded-lg flex-col sm:flex-row">
                   <div className="flex items-center gap-2">
                     {fileType === "image" ? (
-                      <ImageIcon className="w-4 h-4 text-blue-500" />
+                      <ImageIcon className="w-4 h-4 text-primary" />
                     ) : (
-                      <Video className="w-4 h-4 text-green-500" />
+                      <Video className="w-4 h-4 text-primary" />
                     )}
-                    <span className="text-sm font-medium">{file.name}</span>
+                    <span className="text-sm font-medium break-all">{file.name}</span>
                   </div>
                   {colors.length > 0 && (
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 self-stretch sm:self-auto justify-end">
                       {fileType === "image" && (
                         <Button onClick={exportPaletteImage} size="sm" variant="outline">
                           <Download className="w-4 h-4 mr-1" />
@@ -459,12 +459,12 @@ export default function ColorPaletteGenerator() {
         {isProcessing && (
           <Card>
             <CardContent className="p-6">
-              <div className="flex items-center justify-center space-x-2">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>
+              <div className="flex items-center justify-center gap-2">
+                <div className="animate-spin rounded-full h-6 w-6 border-2 border-input border-t-primary"></div>
                 <span>
                   Processing {fileType}...
                   {fileType === "video" && colors.length > 0 && (
-                    <span className="text-sm ml-2">({colors.length} frames processed)</span>
+                    <span className="text-sm text-muted-foreground ml-2">({colors.length} frames processed)</span>
                   )}
                 </span>
               </div>
@@ -481,7 +481,7 @@ export default function ColorPaletteGenerator() {
               <div className="flex justify-center mb-4">
                 <canvas
                   ref={paletteCanvasRef}
-                  className="border-2 border-gray-200 rounded-lg"
+                  className="border rounded-lg"
                   style={{ maxWidth: "100%", height: "auto" }}
                 />
               </div>
@@ -504,23 +504,23 @@ export default function ColorPaletteGenerator() {
                 {colors.map((color, index) => (
                   <div
                     key={index}
-                    className="flex items-center gap-4 p-3 rounded-lg border hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-4 p-3 rounded-lg border hover:bg-accent hover:text-accent-foreground transition-colors"
                   >
                     <div
-                      className="w-12 h-12 rounded-lg border-2 border-gray-200 flex-shrink-0"
+                      className="w-12 h-12 rounded-lg border flex-shrink-0"
                       style={{ backgroundColor: color.hex }}
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-4">
                         <span className="font-mono text-sm font-medium">{color.hex}</span>
-                        <span className="font-mono text-sm ">{color.rgb}</span>
+                        <span className="font-mono text-sm text-muted-foreground">{color.rgb}</span>
                         {fileType === "video" && color.frame && (
-                          <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                          <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
                             Frame {color.frame}
                           </span>
                         )}
                         {fileType === "image" && color.count && (
-                          <span className="text-xs">
+                          <span className="text-xs text-muted-foreground">
                             {((color.count / colors.reduce((sum, c) => sum + (c.count || 0), 0)) * 100).toFixed(1)}%
                           </span>
                         )}
