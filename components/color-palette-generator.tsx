@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useRef } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardAction } from "@/components/ui/card"
 import { Upload, Palette, Download, FileText, ImageIcon, Video } from "lucide-react"
 import { toast } from "sonner"
 import { usePaletteProcessor } from "@/hooks/usePaletteProcessor"
@@ -129,20 +129,6 @@ export default function ColorPaletteGenerator() {
                     )}
                     <span className="text-sm font-medium break-all">{file.name}</span>
                   </div>
-                  {colors.length > 0 && (
-                    <div className="flex gap-2 self-stretch sm:self-auto justify-end">
-                      {fileType === "image" && (
-                        <Button onClick={exportPaletteImage} size="sm" variant="outline">
-                          <Download className="w-4 h-4 mr-1" />
-                          Image
-                        </Button>
-                      )}
-                      <Button onClick={exportColorsText} size="sm" variant="outline">
-                        <FileText className="w-4 h-4 mr-1" />
-                        Text
-                      </Button>
-                    </div>
-                  )}
                 </div>
               )}
             </div>
@@ -169,6 +155,14 @@ export default function ColorPaletteGenerator() {
           <Card>
             <CardHeader>
               <CardTitle>Color Palette Preview</CardTitle>
+              <CardAction>
+                <div className="flex gap-2">
+                  <Button onClick={exportPaletteImage} size="sm" variant="outline">
+                    <Download className="w-4 h-4 mr-1" />
+                    Image
+                  </Button>
+                </div>
+              </CardAction>
             </CardHeader>
             <CardContent>
               <div className="flex justify-center mb-4">
@@ -191,6 +185,14 @@ export default function ColorPaletteGenerator() {
                   ({colors.length} {fileType === "image" ? "colors" : "frames"})
                 </span>
               </CardTitle>
+              <CardAction>
+                <div className="flex gap-2">
+                  <Button onClick={exportColorsText} size="sm" variant="outline">
+                    <Download className="w-4 h-4 mr-1" />
+                    Hex Codes
+                  </Button>
+                </div>
+              </CardAction>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
