@@ -5,7 +5,8 @@ import type React from "react"
 import { useState, useRef, useCallback, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Upload, ImageIcon, Video, Palette, Download, FileText } from "lucide-react"
+import { Upload, ImageIcon, Video, Palette, Download, FileText, Copy } from "lucide-react"
+import { toast } from "sonner"
 
 interface ColorData {
   hex: string
@@ -23,6 +24,8 @@ export default function ColorPaletteGenerator() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const paletteCanvasRef = useRef<HTMLCanvasElement>(null)
   const [frameRate, setFrameRate] = useState<1 | 2 | 5>(2)
+  const [copiedHex, setCopiedHex] = useState<string | null>(null)
+  const copyTimeoutRef = useRef<number | null>(null)
 
   const rgbToHex = (r: number, g: number, b: number): string => {
     return (
@@ -366,6 +369,36 @@ export default function ColorPaletteGenerator() {
     })
   }
 
+  const copyToClipboard = useCallback(async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+    } catch {
+      const textarea = document.createElement("textarea")
+      textarea.value = text
+      textarea.style.position = "fixed"
+      textarea.style.left = "-9999px"
+      document.body.appendChild(textarea)
+      textarea.focus()
+      textarea.select()
+      document.execCommand("copy")
+      document.body.removeChild(textarea)
+    }
+    setCopiedHex(text)
+    toast(`Copied ${text}`)
+    if (copyTimeoutRef.current) {
+      window.clearTimeout(copyTimeoutRef.current)
+    }
+    copyTimeoutRef.current = window.setTimeout(() => setCopiedHex(null), 1200)
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current) {
+        window.clearTimeout(copyTimeoutRef.current)
+      }
+    }
+  }, [])
+
   return (
     <div className="min-h-screen p-4">
       <div className="max-w-4xl mx-auto space-y-6">
@@ -504,7 +537,7 @@ export default function ColorPaletteGenerator() {
                 {colors.map((color, index) => (
                   <div
                     key={index}
-                    className="flex items-center gap-4 p-3 rounded-lg border hover:bg-accent hover:text-accent-foreground transition-colors"
+                    className="flex items-center gap-4 p-3 rounded-lg border hover:bg-accent hover:text-accent-foreground transition-colors select-none"
                   >
                     <div
                       className="w-12 h-12 rounded-lg border flex-shrink-0"
@@ -514,6 +547,7 @@ export default function ColorPaletteGenerator() {
                       <div className="flex items-center gap-4">
                         <span className="font-mono text-sm font-medium">{color.hex}</span>
                         <span className="font-mono text-sm text-muted-foreground">{color.rgb}</span>
+                        
                         {fileType === "video" && color.frame && (
                           <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
                             Frame {color.frame}
@@ -525,6 +559,19 @@ export default function ColorPaletteGenerator() {
                           </span>
                         )}
                       </div>
+                    </div>
+                    <div className="ml-auto">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        aria-label={`Copy ${color.hex}`}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          copyToClipboard(color.hex)
+                        }}
+                      >
+                        <Copy className="w-4 h-4" />
+                      </Button>
                     </div>
                   </div>
                 ))}
