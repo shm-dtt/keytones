@@ -109,7 +109,10 @@ export default function ColorPaletteGenerator() {
                 className="hidden"
               />
 
-              <UploadDropzone onPick={() => fileInputRef.current?.click()} />
+              <UploadDropzone
+                onPick={() => fileInputRef.current?.click()}
+                onDropFile={(file) => handleFileSelect(file)}
+              />
 
               {/* Video controls removed */}
 
