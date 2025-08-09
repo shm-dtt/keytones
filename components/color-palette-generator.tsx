@@ -115,7 +115,7 @@ export default function ColorPaletteGenerator() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center justify-center gap-2">
               <Upload className="w-5 h-5" />
               Upload File
             </CardTitle>
