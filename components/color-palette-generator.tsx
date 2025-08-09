@@ -11,18 +11,10 @@ import {
   CardTitle,
   CardAction,
 } from "@/components/ui/card";
-import {
-  Upload,
-  Palette,
-  Download,
-  FileText,
-  ImageIcon,
-  Video,
-} from "lucide-react";
+import { Upload, Download, FileText, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { usePaletteProcessor } from "@/hooks/usePaletteProcessor";
 import { UploadDropzone } from "@/components/UploadDropzone";
-import { VideoControls } from "@/components/VideoControls";
 import { ColorItem } from "@/components/ColorItem";
 import type { ColorData } from "@/lib/colors";
 import Image from "next/image";
@@ -30,9 +22,9 @@ import Image from "next/image";
 export default function ColorPaletteGenerator() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const {
-    state: { file, colors, isProcessing, fileType, frameRate },
+    state: { file, colors, isProcessing, fileType },
     refs: { canvasRef, paletteCanvasRef },
-    actions: { setFrameRate, handleFileSelect },
+    actions: { handleFileSelect },
   } = usePaletteProcessor();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,13 +36,7 @@ export default function ColorPaletteGenerator() {
     if (colors.length === 0) return;
 
     const content = colors
-      .map((color, index) => {
-        if (fileType === "video") {
-          return `Frame ${color.frame}: ${color.hex} (${color.rgb})`;
-        } else {
-          return `Color ${index + 1}: ${color.hex} (${color.rgb})`;
-        }
-      })
+      .map((color, index) => `Color ${index + 1}: ${color.hex} (${color.rgb})`)
       .join("\n");
 
     const blob = new Blob([content], { type: "text/plain" });
@@ -108,45 +94,29 @@ export default function ColorPaletteGenerator() {
             Keytones
           </h1>
           <p className="text-muted-foreground">
-            Extract color palettes from images or dominant colors from video
-            frames
+            Extract color palettes from images
           </p>
         </div>
 
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-center gap-2">
-              <Upload className="w-5 h-5" />
-              Upload File
-            </CardTitle>
-          </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/*,video/*"
+                accept="image/*"
                 onChange={handleFileChange}
                 className="hidden"
               />
 
               <UploadDropzone onPick={() => fileInputRef.current?.click()} />
 
-              {file && fileType === "video" && (
-                <VideoControls
-                  frameRate={frameRate}
-                  setFrameRate={setFrameRate}
-                />
-              )}
+              {/* Video controls removed */}
 
               {file && (
                 <div className="flex items-center justify-between gap-3 p-3 bg-muted rounded-lg flex-col sm:flex-row">
                   <div className="flex items-center gap-2">
-                    {fileType === "image" ? (
-                      <ImageIcon className="w-4 h-4 text-primary" />
-                    ) : (
-                      <Video className="w-4 h-4 text-primary" />
-                    )}
+                    <ImageIcon className="w-4 h-4 text-primary" />
                     <span className="text-sm font-medium break-all">
                       {file.name}
                     </span>
@@ -163,12 +133,7 @@ export default function ColorPaletteGenerator() {
               <div className="flex items-center justify-center gap-2">
                 <div className="animate-spin rounded-full h-6 w-6 border-2 border-input border-t-primary"></div>
                 <span>
-                  Processing {fileType}...
-                  {fileType === "video" && colors.length > 0 && (
-                    <span className="text-sm text-muted-foreground ml-2">
-                      ({colors.length} frames processed)
-                    </span>
-                  )}
+                  Processing image...
                 </span>
               </div>
             </CardContent>
@@ -208,10 +173,8 @@ export default function ColorPaletteGenerator() {
           <Card>
             <CardHeader>
               <CardTitle>
-                {fileType === "image" ? "Color Details" : "Frame Colors"}
-                <span className="text-sm font-normal ml-2">
-                  ({colors.length} {fileType === "image" ? "colors" : "frames"})
-                </span>
+                Color Details
+                <span className="text-sm font-normal ml-2">({colors.length} colors)</span>
               </CardTitle>
               <CardAction>
                 <div className="flex gap-2">

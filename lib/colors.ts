@@ -2,7 +2,6 @@ export interface ColorData {
   hex: string
   rgb: string
   count?: number
-  frame?: number
 }
 
 export const rgbToHex = (r: number, g: number, b: number): string => {
@@ -126,33 +125,6 @@ export const getImageColors = (imageData: ImageData): ColorData[] => {
     .sort((a, b) => (b.count || 0) - (a.count || 0))
 }
 
-export const getDominantColor = (imageData: ImageData): ColorData => {
-  const data = imageData.data
-  const colorMap = new Map<string, number>()
-
-  for (let i = 0; i < data.length; i += 32) {
-    const r = data[i]
-    const g = data[i + 1]
-    const b = data[i + 2]
-    const alpha = data[i + 3]
-
-    if (alpha > 128) {
-      const hex = rgbToHex(r, g, b)
-      colorMap.set(hex, (colorMap.get(hex) || 0) + 1)
-    }
-  }
-
-  const [hex] =
-    Array.from(colorMap.entries()).sort((a, b) => b[1] - a[1])[0] || ["#000000", 0]
-
-  const r = Number.parseInt(hex.slice(1, 3), 16)
-  const g = Number.parseInt(hex.slice(3, 5), 16)
-  const b = Number.parseInt(hex.slice(5, 7), 16)
-
-  return {
-    hex,
-    rgb: `rgb(${r}, ${g}, ${b})`,
-  }
-}
+// getDominantColor removed as the app now supports only images
 
 

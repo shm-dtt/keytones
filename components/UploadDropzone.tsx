@@ -1,6 +1,6 @@
 "use client"
 
-import { ImageIcon, Video } from "lucide-react"
+import { ImageIcon } from "lucide-react"
 
 interface UploadDropzoneProps {
   onPick(): void
@@ -13,12 +13,11 @@ export function UploadDropzone({ onPick }: UploadDropzoneProps) {
       onClick={onPick}
     >
       <div className="space-y-2">
-        <div className="flex justify-center gap-4">
+        <div className="flex justify-center">
           <ImageIcon className="w-8 h-8 text-muted-foreground" />
-          <Video className="w-8 h-8 text-muted-foreground" />
         </div>
-        <p className="text-muted-foreground">Click to upload an image or video</p>
-        <p className="text-xs sm:text-sm text-muted-foreground">Supports JPG, PNG, MP4, WebM, and more</p>
+        <p className="text-muted-foreground">Click to upload an image</p>
+        <p className="text-xs sm:text-sm text-muted-foreground">Supports all kind of image formats</p>
       </div>
     </div>
   )

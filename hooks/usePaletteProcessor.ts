@@ -1,14 +1,13 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { ColorData, getDominantColor, getImageColors } from "@/lib/colors"
+import { ColorData, getImageColors } from "@/lib/colors"
 
 export function usePaletteProcessor() {
   const [file, setFile] = useState<File | null>(null)
   const [colors, setColors] = useState<ColorData[]>([])
   const [isProcessing, setIsProcessing] = useState(false)
-  const [fileType, setFileType] = useState<"image" | "video" | null>(null)
-  const [frameRate, setFrameRate] = useState<1 | 2 | 5>(2)
+  const [fileType, setFileType] = useState<"image" | null>(null)
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const paletteCanvasRef = useRef<HTMLCanvasElement>(null)
@@ -41,61 +40,7 @@ export function usePaletteProcessor() {
     [],
   )
 
-  const processVideo = useCallback(
-    async (inputFile: File) => {
-      const canvas = canvasRef.current
-      if (!canvas) return
-
-      const ctx = canvas.getContext("2d")
-      if (!ctx) return
-
-      const video = document.createElement("video")
-      video.crossOrigin = "anonymous"
-
-      return new Promise<void>((resolve) => {
-        video.onloadedmetadata = () => {
-          canvas.width = Math.min(video.videoWidth, 400)
-          canvas.height = Math.min(video.videoHeight, 300)
-
-          const duration = video.duration
-          const frameCount = Math.floor(duration * frameRate)
-          const frameColors: ColorData[] = []
-          let currentFrame = 0
-
-          const captureFrame = () => {
-            if (currentFrame >= frameCount) {
-              setColors(frameColors)
-              resolve()
-              return
-            }
-
-            const time = (currentFrame / frameCount) * duration
-            video.currentTime = time
-
-            video.onseeked = () => {
-              ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
-              const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-              const dominantColor = getDominantColor(imageData)
-
-              frameColors.push({
-                ...dominantColor,
-                frame: currentFrame + 1,
-              })
-
-              currentFrame++
-              captureFrame()
-            }
-          }
-
-          captureFrame()
-        }
-
-        video.src = URL.createObjectURL(inputFile)
-        video.load()
-      })
-    },
-    [frameRate],
-  )
+  // processVideo removed as the app now supports only images
 
   const generatePaletteImage = useCallback((palette: ColorData[]) => {
     const canvas = paletteCanvasRef.current
@@ -121,27 +66,21 @@ export function usePaletteProcessor() {
       setColors([])
       setIsProcessing(true)
 
-      const type = selected.type.startsWith("image/") ? "image" : "video"
+      const type = selected.type.startsWith("image/") ? "image" : null
       setFileType(type)
 
       try {
         if (type === "image") {
           await processImage(selected)
-        } else {
-          await processVideo(selected)
         }
       } finally {
         setIsProcessing(false)
       }
     },
-    [processImage, processVideo],
+    [processImage],
   )
 
-  useEffect(() => {
-    if (file && fileType === "video" && !isProcessing) {
-      handleFileSelect(file)
-    }
-  }, [frameRate])
+  // frameRate effect removed
 
   useEffect(() => {
     if (fileType === "image" && colors.length > 0) {
@@ -150,9 +89,9 @@ export function usePaletteProcessor() {
   }, [colors, fileType, generatePaletteImage])
 
   return {
-    state: { file, colors, isProcessing, fileType, frameRate },
+    state: { file, colors, isProcessing, fileType },
     refs: { canvasRef, paletteCanvasRef },
-    actions: { setFrameRate, handleFileSelect },
+    actions: { handleFileSelect },
   }
 }
 

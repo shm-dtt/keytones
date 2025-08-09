@@ -21,11 +21,7 @@ export function ColorItem({ color, totalCount = 0, onCopy }: ColorItemProps) {
         <div className="flex items-center gap-4">
           <span className="font-mono text-sm font-medium">{color.hex}</span>
           <span className="font-mono text-sm text-muted-foreground">{color.rgb}</span>
-          {typeof color.frame === "number" && (
-            <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
-              Frame {color.frame}
-            </span>
-          )}
+          {/* Frame badge removed since video support is dropped */}
           {typeof color.count === "number" && totalCount > 0 && (
             <span className="text-xs text-muted-foreground">
               {((color.count / totalCount) * 100).toFixed(1)}%
