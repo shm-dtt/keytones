@@ -35,7 +35,7 @@ export function ColorItem({ color, totalCount = 0, onCopy }: ColorItemProps) {
       </div>
       <div className="ml-auto">
         <Button
-          variant="ghost"
+          variant="outline"
           size="icon"
           aria-label={`Copy ${color.hex}`}
           onClick={() => onCopy(color.hex)}

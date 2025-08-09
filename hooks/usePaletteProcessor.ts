@@ -152,7 +152,7 @@ export function usePaletteProcessor() {
   return {
     state: { file, colors, isProcessing, fileType, frameRate },
     refs: { canvasRef, paletteCanvasRef },
-    actions: { setFrameRate, handleFileSelect, setColors },
+    actions: { setFrameRate, handleFileSelect },
   }
 }
 
