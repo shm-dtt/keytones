@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { ImageIcon } from "lucide-react"
 
 interface UploadDropzoneProps {
@@ -10,23 +10,32 @@ interface UploadDropzoneProps {
 
 export function UploadDropzone({ onPick, onDropFile }: UploadDropzoneProps) {
   const [isDragging, setIsDragging] = useState(false)
+  const dragCounter = useRef(0)
+
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    dragCounter.current += 1
+    if (!isDragging) setIsDragging(true)
+  }
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     e.stopPropagation()
-    if (!isDragging) setIsDragging(true)
   }
 
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     e.stopPropagation()
-    if (isDragging) setIsDragging(false)
+    dragCounter.current = Math.max(0, dragCounter.current - 1)
+    if (dragCounter.current === 0 && isDragging) setIsDragging(false)
   }
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     e.stopPropagation()
-    setIsDragging(false)
+    dragCounter.current = 0
+    if (isDragging) setIsDragging(false)
     const files = e.dataTransfer?.files
     if (!files || files.length === 0) return
     const file = files[0]
@@ -43,8 +52,8 @@ export function UploadDropzone({ onPick, onDropFile }: UploadDropzoneProps) {
         isDragging ? "border-primary bg-muted/30" : "hover:border-primary hover:bg-muted/30"
       }`}
       onClick={onPick}
+      onDragEnter={handleDragEnter}
       onDragOver={handleDragOver}
-      onDragEnter={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
