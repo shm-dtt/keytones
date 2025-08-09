@@ -370,11 +370,11 @@ export default function ColorPaletteGenerator() {
     <div className="min-h-screen p-4">
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold text-gray-900 flex items-center justify-center gap-2">
-            <Palette className="w-8 h-8 text-purple-600" />
+          <h1 className="text-4xl font-bold flex items-center justify-center gap-2">
+            <Palette className="w-8 h-8" />
             Color Palette Generator
           </h1>
-          <p className="text-gray-600">Extract color palettes from images or dominant colors from video frames</p>
+          <p >Extract color palettes from images or dominant colors from video frames</p>
         </div>
 
         <Card>
@@ -400,11 +400,11 @@ export default function ColorPaletteGenerator() {
               >
                 <div className="space-y-2">
                   <div className="flex justify-center gap-4">
-                    <ImageIcon className="w-8 h-8 text-gray-400" />
-                    <Video className="w-8 h-8 text-gray-400" />
+                    <ImageIcon className="w-8 h-8" />
+                    <Video className="w-8 h-8" />
                   </div>
-                  <p className="text-gray-600">Click to upload an image or video</p>
-                  <p className="text-sm text-gray-400">Supports JPG, PNG, MP4, WebM, and more</p>
+                  <p className="">Click to upload an image or video</p>
+                  <p className="text-sm">Supports JPG, PNG, MP4, WebM, and more</p>
                 </div>
               </div>
 
@@ -422,7 +422,7 @@ export default function ColorPaletteGenerator() {
                       5 FPS
                     </Button>
                   </div>
-                  <span className="text-xs text-gray-500">(~{Math.floor(16 * frameRate)} frames for 16s video)</span>
+                  <span className="text-xs">(~{Math.floor(16 * frameRate)} frames for 16s video)</span>
                 </div>
               )}
 
@@ -464,7 +464,7 @@ export default function ColorPaletteGenerator() {
                 <span>
                   Processing {fileType}...
                   {fileType === "video" && colors.length > 0 && (
-                    <span className="text-sm text-gray-500 ml-2">({colors.length} frames processed)</span>
+                    <span className="text-sm ml-2">({colors.length} frames processed)</span>
                   )}
                 </span>
               </div>
@@ -494,7 +494,7 @@ export default function ColorPaletteGenerator() {
             <CardHeader>
               <CardTitle>
                 {fileType === "image" ? "Color Details" : "Frame Colors"}
-                <span className="text-sm font-normal text-gray-500 ml-2">
+                <span className="text-sm font-normal ml-2">
                   ({colors.length} {fileType === "image" ? "colors" : "frames"})
                 </span>
               </CardTitle>
@@ -513,14 +513,14 @@ export default function ColorPaletteGenerator() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-4">
                         <span className="font-mono text-sm font-medium">{color.hex}</span>
-                        <span className="font-mono text-sm text-gray-600">{color.rgb}</span>
+                        <span className="font-mono text-sm ">{color.rgb}</span>
                         {fileType === "video" && color.frame && (
-                          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                          <span className="text-xs bg-gray-100 px-2 py-1 rounded">
                             Frame {color.frame}
                           </span>
                         )}
                         {fileType === "image" && color.count && (
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs">
                             {((color.count / colors.reduce((sum, c) => sum + (c.count || 0), 0)) * 100).toFixed(1)}%
                           </span>
                         )}

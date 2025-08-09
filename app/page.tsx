@@ -1,5 +1,11 @@
-import ColorPaletteGenerator from "@/color-palette-generator"
+import ColorPaletteGenerator from "@/color-palette-generator";
+import { ModeToggle } from "@/components/mode-toggle";
 
 export default function Home() {
-  return <ColorPaletteGenerator />
+  return (
+    <>
+      <ModeToggle />
+      <ColorPaletteGenerator />
+    </>
+  );
 }
