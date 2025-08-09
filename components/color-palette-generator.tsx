@@ -1,0 +1,218 @@
+"use client"
+
+import type React from "react"
+
+import { useRef } from "react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Upload, Palette, Download, FileText, ImageIcon, Video } from "lucide-react"
+import { toast } from "sonner"
+import { usePaletteProcessor } from "@/hooks/usePaletteProcessor"
+import { UploadDropzone } from "@/components/UploadDropzone"
+import { VideoControls } from "@/components/VideoControls"
+import { ColorItem } from "@/components/ColorItem"
+import type { ColorData } from "@/lib/colors"
+
+export default function ColorPaletteGenerator() {
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const {
+    state: { file, colors, isProcessing, fileType, frameRate },
+    refs: { canvasRef, paletteCanvasRef },
+    actions: { setFrameRate, handleFileSelect },
+  } = usePaletteProcessor()
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0]
+    if (selectedFile) handleFileSelect(selectedFile)
+  }
+
+  const exportColorsText = () => {
+    if (colors.length === 0) return
+
+    const content = colors
+      .map((color, index) => {
+        if (fileType === "video") {
+          return `Frame ${color.frame}: ${color.hex} (${color.rgb})`
+        } else {
+          return `Color ${index + 1}: ${color.hex} (${color.rgb})`
+        }
+      })
+      .join("\n")
+
+    const blob = new Blob([content], { type: "text/plain" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `color-palette-${file?.name || "export"}.txt`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  const exportPaletteImage = () => {
+    const canvas = paletteCanvasRef.current
+    if (!canvas || fileType !== "image") return
+
+    canvas.toBlob((blob) => {
+      if (blob) {
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = `color-palette-${file?.name || "export"}.png`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+      }
+    })
+  }
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+    } catch {
+      const textarea = document.createElement("textarea")
+      textarea.value = text
+      textarea.style.position = "fixed"
+      textarea.style.left = "-9999px"
+      document.body.appendChild(textarea)
+      textarea.focus()
+      textarea.select()
+      document.execCommand("copy")
+      document.body.removeChild(textarea)
+    }
+    toast(`Copied ${text}`)
+  }
+
+  return (
+    <div className="min-h-screen p-4">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div className="text-center space-y-2">
+          <h1 className="text-3xl sm:text-4xl font-bold text-foreground flex items-center justify-center gap-2">
+            <Palette className="w-8 h-8 text-primary" />
+            Color Palette Generator
+          </h1>
+          <p className="text-muted-foreground">Extract color palettes from images or dominant colors from video frames</p>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Upload className="w-5 h-5" />
+              Upload File
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*,video/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+
+              <UploadDropzone onPick={() => fileInputRef.current?.click()} />
+
+              {file && fileType === "video" && (
+                <VideoControls frameRate={frameRate} setFrameRate={setFrameRate} />
+              )}
+
+              {file && (
+                <div className="flex items-center justify-between gap-3 p-3 bg-muted rounded-lg flex-col sm:flex-row">
+                  <div className="flex items-center gap-2">
+                    {fileType === "image" ? (
+                      <ImageIcon className="w-4 h-4 text-primary" />
+                    ) : (
+                      <Video className="w-4 h-4 text-primary" />
+                    )}
+                    <span className="text-sm font-medium break-all">{file.name}</span>
+                  </div>
+                  {colors.length > 0 && (
+                    <div className="flex gap-2 self-stretch sm:self-auto justify-end">
+                      {fileType === "image" && (
+                        <Button onClick={exportPaletteImage} size="sm" variant="outline">
+                          <Download className="w-4 h-4 mr-1" />
+                          Image
+                        </Button>
+                      )}
+                      <Button onClick={exportColorsText} size="sm" variant="outline">
+                        <FileText className="w-4 h-4 mr-1" />
+                        Text
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {isProcessing && (
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-center gap-2">
+                <div className="animate-spin rounded-full h-6 w-6 border-2 border-input border-t-primary"></div>
+                <span>
+                  Processing {fileType}...
+                  {fileType === "video" && colors.length > 0 && (
+                    <span className="text-sm text-muted-foreground ml-2">({colors.length} frames processed)</span>
+                  )}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {colors.length > 0 && fileType === "image" && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Color Palette Preview</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex justify-center mb-4">
+                <canvas
+                  ref={paletteCanvasRef}
+                  className="border rounded-lg"
+                  style={{ maxWidth: "100%", height: "auto" }}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {colors.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                {fileType === "image" ? "Color Details" : "Frame Colors"}
+                <span className="text-sm font-normal ml-2">
+                  ({colors.length} {fileType === "image" ? "colors" : "frames"})
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {colors.map((color, index) => (
+                  <ColorItem
+                    key={index}
+                    color={color as ColorData}
+                    totalCount={
+                      fileType === "image"
+                        ? colors.reduce((sum, c) => sum + (c.count || 0), 0)
+                        : undefined
+                    }
+                    onCopy={copyToClipboard}
+                  />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        <canvas ref={canvasRef} className="hidden" />
+      </div>
+    </div>
+  )
+}
