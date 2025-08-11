@@ -18,9 +18,11 @@ export function ColorItem({ color, totalCount = 0, onCopy }: ColorItemProps) {
         style={{ backgroundColor: color.hex }}
       />
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-4">
-          <span className="font-mono text-sm font-medium">{color.hex}</span>
+        <div className="flex justify-between items-center gap-4">
+          <div className="flex flex-col">
+            <span className="font-mono text-sm font-medium">{color.hex}</span>
           <span className="font-mono text-sm text-muted-foreground">{color.rgb}</span>
+          </div>
           {/* Frame badge removed since video support is dropped */}
           {typeof color.count === "number" && totalCount > 0 && (
             <span className="text-xs text-muted-foreground">
