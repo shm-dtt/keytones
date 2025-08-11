@@ -146,6 +146,24 @@ export default function ColorPaletteGenerator() {
         {colors.length > 0 && fileType === "image" && (
           <Card>
             <CardHeader>
+              <CardTitle>Image Preview</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex justify-center mb-4">
+                <img
+                  src={file ? URL.createObjectURL(file) : ""}
+                  alt="Uploaded image"
+                  className="max-w-full h-auto rounded-lg border"
+                  style={{ maxHeight: "400px" }}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {colors.length > 0 && fileType === "image" && (
+          <Card>
+            <CardHeader>
               <CardTitle>Color Palette Preview</CardTitle>
               <CardAction>
                 <div className="flex gap-2">

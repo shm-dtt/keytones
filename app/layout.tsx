@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Keytones",
+  title: "Keytones - Color Palette Generator",
   description: "Extract color palettes from images or dominant colors from video frames",
 };
 
