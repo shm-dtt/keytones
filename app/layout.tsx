@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider"
 import { Navbar } from "@/components/Navbar"
 import { Toaster } from "@/components/ui/sonner";
+import { Analytics } from "@vercel/analytics/next"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,7 +18,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Keytones - Color Palette Generator",
-  description: "Extract color palettes from images or dominant colors from video frames",
+  description: "Extract color palettes from images.",
 };
 
 export default function RootLayout({
@@ -38,6 +39,7 @@ export default function RootLayout({
           >
             <Navbar />
             {children}
+            <Analytics/>
             <Toaster  position="top-center" />
           </ThemeProvider>
       </body>

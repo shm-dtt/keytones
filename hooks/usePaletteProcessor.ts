@@ -40,8 +40,6 @@ export function usePaletteProcessor() {
     [],
   )
 
-  // processVideo removed as the app now supports only images
-
   const generatePaletteImage = useCallback((palette: ColorData[]) => {
     const canvas = paletteCanvasRef.current
     if (!canvas || palette.length === 0) return

@@ -114,8 +114,6 @@ export default function ColorPaletteGenerator() {
                 onDropFile={(file) => handleFileSelect(file)}
               />
 
-              {/* Video controls removed */}
-
               {file && (
                 <div className="flex items-center justify-between gap-3 p-3 bg-muted rounded-lg flex-col sm:flex-row">
                   <div className="flex items-center gap-2">
